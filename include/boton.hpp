@@ -1,6 +1,3 @@
-#ifndef BOTON_HPP
-#define BOTON_HPP
-
 #include <SFML/Graphics.hpp>
 #include <functional>
 #include <memory>
@@ -30,5 +27,3 @@ private:
     
     bool mouseEstaEncima(const RenderWindow& ventana) const;
 };
-
-#endif

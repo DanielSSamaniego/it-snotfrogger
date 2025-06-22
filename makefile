@@ -1,43 +1,20 @@
+# Configuración básica
 GAME := game
+CXX := g++
 SFML := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lbox2d
-CXX :=g++
 INCLUDE := -Iinclude
 EXE := bin/$(GAME)
-TEMP_PATH := /c/Users/herod/AppData/Local/Temp
-$(EXE) : src/main.cpp
-	TEMP=$(TEMP_PATH) TMP=$(TEMP_PATH) $(CXX) $< -o $@ $(SFML) $(INCLUDE) -std=c++17
 
-run : $(EXE)
-	./$<
+# Regla principal (compila solo main.cpp)
+$(EXE): src/main.cpp src/boton.cpp
+	$(CXX) $^ -o $@ $(INCLUDE) $(SFML) -std=c++17
 
+# Regla para ejecutar
+run: $(EXE)
+	./$(EXE)
 
-
-
-
-# Directorios de origen y destino
-SRC_DIR := src
-BIN_DIR := bin
-
-# Obtener todos los archivos .cpp en el directorio de origen
-CPP_FILES := $(wildcard $(SRC_DIR)/*.cpp)
-
-# Generar los nombres de los archivos .exe en el directorio de destino
-EXE_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%.exe,$(CPP_FILES))
-
-# Regla para compilar cada archivo .cpp y generar el archivo .exe correspondiente
-$(BIN_DIR)/%.exe: $(SRC_DIR)/%.cpp
-	g++ $< -o $@ $(SFML) -Iinclude
-
-# Regla por defecto para compilar todos los archivos .cpp
-all: $(EXE_FILES)
-
-# Regla para ejecutar cada archivo .exe
-run%: $(BIN_DIR)/%.exe
-	./$<
-
-# Regla para limpiar los archivos generados
+# Regla para limpiar (solo elimina el ejecutable)
 clean:
-	rm -f $(EXE_FILES)
+	rm -f $(EXE)
 
-.PHONY: all clean
-.PHONY: run-%
+.PHONY: run clean
