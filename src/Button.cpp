@@ -1,6 +1,6 @@
 #include "../include/Button.hpp"
 
-Button::Button() : is_pressed(false), is_hovered(false) {}
+Button::Button() : is_pressed(false), is_hovered(false), was_clicked(false) {}
 
 void Button::load_textures(const string& normal_path, const string& pressed_path)
 {
@@ -20,17 +20,20 @@ void Button::set_position(float x, float y)
 void Button::update(const Vector2f& mouse_pos, bool mouse_pressed)
 {
     is_hovered = sprite.getGlobalBounds().contains(mouse_pos);
-    
+
     if (is_hovered)
     {
         if (mouse_pressed)
         {
-            is_pressed = true;
+            if (!is_pressed) {
+                is_pressed = true;
+            }
             sprite.setTexture(pressed_texture);
         }
         else if (is_pressed && !mouse_pressed)
         {
             is_pressed = false;
+            was_clicked = true; // Solo se activa cuando se suelta el mouse sobre el botón
             sprite.setTexture(normal_texture);
         }
     }
@@ -51,9 +54,13 @@ void Button::draw(RenderWindow& window)
     window.draw(sprite);
 }
 
-bool Button::is_clicked() const
+bool Button::is_clicked()
 {
-    return is_hovered && !is_pressed;
+    if (was_clicked) {
+        was_clicked = false;
+        return true;
+    }
+    return false;
 }
 
 FloatRect Button::get_bounds() const

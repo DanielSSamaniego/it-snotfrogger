@@ -11,6 +11,7 @@ class Button
     Sprite sprite;
     bool is_pressed;
     bool is_hovered;
+    bool was_clicked; // Nuevo atributo para detectar clic real
 
 public:
     Button();
@@ -19,6 +20,7 @@ public:
     void set_position(float x, float y);
     void update(const Vector2f& mouse_pos, bool mouse_pressed);
     void draw(RenderWindow& window);
-    bool is_clicked() const;
+    bool is_clicked(); // Quitar const porque modifica was_clicked
     FloatRect get_bounds() const;
+    void set_scale(float x, float y) { sprite.setScale(x, y); } // Nuevo método para escalar el sprite
 };

@@ -53,11 +53,27 @@ int main()
     // Botones
     Button play_button;
     play_button.load_textures("assets/images/play_button.png", "assets/images/play_button_pressed.png");
-    play_button.set_position(CELL_SIZE * MAP_WIDTH / 2 - 100, CELL_SIZE * MAP_HEIGHT / 2);
+    // Botón play: tamaño 5x2 celdas, posición: 5 celdas a la derecha y 3 arriba desde la esquina inferior izquierda
+    float play_width = CELL_SIZE * 5;
+    float play_height = CELL_SIZE * 2;
+    float play_scale_x = play_width / play_button.get_bounds().width;
+    float play_scale_y = play_height / play_button.get_bounds().height;
+    play_button.set_scale(play_scale_x, play_scale_y);
+    float play_x = CELL_SIZE * 5;
+    float play_y = (FONT_HEIGHT + CELL_SIZE * MAP_HEIGHT) - (CELL_SIZE * 2) - play_height;
+    play_button.set_position(play_x, play_y);
 
     Button exit_button;
     exit_button.load_textures("assets/images/exit_button.png", "assets/images/exit_button_pressed.png");
-    exit_button.set_position(CELL_SIZE * MAP_WIDTH / 2 - 100, CELL_SIZE * MAP_HEIGHT / 2 + 120);
+    // Botón de salir: tamaño 3x2 celdas, posición: 11 celdas a la derecha y 1 arriba desde la esquina inferior izquierda
+    float exit_width = CELL_SIZE * 3;
+    float exit_height = CELL_SIZE * 2;
+    float exit_scale_x = exit_width / exit_button.get_bounds().width;
+    float exit_scale_y = exit_height / exit_button.get_bounds().height;
+    exit_button.set_scale(exit_scale_x, exit_scale_y);
+    float exit_x = CELL_SIZE * 11;
+    float exit_y = (FONT_HEIGHT + CELL_SIZE * MAP_HEIGHT) - (CELL_SIZE * 1) - exit_height;
+    exit_button.set_position(exit_x, exit_y);
 
     // Música
     MusicManager music_manager;
@@ -194,9 +210,6 @@ int main()
             window.draw(menu_sprite);
             play_button.draw(window);
             exit_button.draw(window);
-            
-            draw_text(1, CELL_SIZE * MAP_WIDTH / 2, CELL_SIZE * MAP_HEIGHT / 4, 
-                     "SKYCROSSER", window);
         }
         else if (game_state == GameState::PLAYING)
         {
