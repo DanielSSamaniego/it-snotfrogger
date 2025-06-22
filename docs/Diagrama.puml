@@ -1,0 +1,136 @@
+@startuml
+' Diagrama de clases: relaciones "usa" (o--), "tiene" (*--), "es" (<--) según el flujo real del código
+
+class Main
+class Button {
+    - normal_texture : Texture
+    - pressed_texture : Texture
+    - sprite : Sprite
+    - is_pressed : bool
+    - is_hovered : bool
+    + Button()
+    + load_textures(normal_path, pressed_path)
+    + set_position(x, y)
+    + update(mouse_pos, mouse_pressed)
+    + draw(window)
+    + is_clicked()
+    + get_bounds()
+}
+class MusicManager {
+    - menu_music : Music
+    - game_music : Music
+    - music_enabled : bool
+    + MusicManager()
+    + load_music()
+    + play_menu_music()
+    + play_game_music()
+    + stop_music()
+    + toggle_music(enabled)
+}
+class TorreControl {
+    - aviones : vector<Avion>
+    + TorreControl(i_level)
+    + draw(i_window)
+    + generate_level(i_level)
+    + update(i_pajaro)
+}
+class Pajaro {
+    - dead : bool
+    - x : short
+    - animation_timer : unsigned char
+    - current_frame : unsigned char
+    - direction : unsigned char
+    - y : unsigned short
+    - control_keys : array<bool,4>
+    - sprite : Sprite
+    - texture : Texture
+    + Pajaro()
+    + get_dead()
+    + update_altitude(i_altitude_zones)
+    + get_y()
+    + draw(i_window)
+    + move(i_value)
+    + reset()
+    + set_dead()
+    + update()
+}
+class ClimaControl {
+    - nubes : vector<Nube>
+    - globos : vector<GloboAerostatico>
+    + ClimaControl(i_level)
+    + draw(i_window)
+    + generate_level(i_level)
+    + update(i_pajaro)
+}
+class DrawMap {
+    + draw_map(i_swamp, i_window)
+}
+class DrawText {
+    + draw_text(i_center, i_x, i_y, i_text, i_window)
+}
+class Nube {
+    - direction : bool
+    - x : short
+    - animation_timer : unsigned char
+    - current_frame : unsigned char
+    - size : unsigned char
+    - speed : unsigned char
+    - type : unsigned char
+    - y : unsigned short
+    - sprite : Sprite
+    - texture : Texture
+    + Nube(i_type, i_x, i_y)
+    + check_pajaro(i_pajaro)
+    + draw(i_window)
+    + update(i_move_pajaro, i_pajaro)
+}
+class GloboAerostatico {
+    - direction : bool
+    - diving : bool
+    - diving_down : bool
+    - x : short
+    - y : unsigned short
+    - animation_timer : unsigned char
+    - current_frame : unsigned char
+    - diving_state : unsigned char
+    - diving_timer : unsigned char
+    - size : unsigned char
+    - speed : unsigned char
+    - sprite : Sprite
+    - texture : Texture
+    + GloboAerostatico(i_diving, i_size, i_x, i_y)
+    + check_pajaro(i_pajaro)
+    + draw(i_window)
+    + update(i_move_pajaro, i_pajaro)
+    + get_rect()
+}
+class Avion {
+    - direction : bool
+    - x : short
+    - size : unsigned char
+    - speed : unsigned char
+    - type : unsigned char
+    - y : unsigned short
+    - sprite : Sprite
+    - texture : Texture
+    + Avion(i_x, i_y)
+    + draw(i_window)
+    + update()
+    + get_rect()
+}
+
+' Relaciones principales
+Main o-- Button
+Main o-- MusicManager
+Main o-- TorreControl
+Main o-- Pajaro
+Main o-- ClimaControl
+Main o-- DrawMap
+Main o-- DrawText
+TorreControl *-- Avion
+ClimaControl *-- Nube
+ClimaControl *-- GloboAerostatico
+Nube o-- Pajaro
+GloboAerostatico o-- Pajaro
+
+@enduml

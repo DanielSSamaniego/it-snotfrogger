@@ -6,7 +6,7 @@ INCLUDE := -Iinclude
 EXE := bin/$(GAME)
 
 # Regla principal (compila solo Main.cpp)
-$(EXE): src/Main.cpp src/TorreControl.cpp src/Pajaro.cpp src/ClimaControl.cpp src/DrawMap.cpp src/DrawText.cpp src/Nube.cpp src/GloboAerostatico.cpp src/Avion.cpp
+$(EXE): src/Main.cpp src/Button.cpp src/MusicManager.cpp src/TorreControl.cpp src/Pajaro.cpp src/ClimaControl.cpp src/DrawMap.cpp src/DrawText.cpp src/Nube.cpp src/GloboAerostatico.cpp src/Avion.cpp
 	$(CXX) $^ -o $@ $(INCLUDE) $(SFML) -std=c++17
 
 # Regla para ejecutar

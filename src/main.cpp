@@ -12,73 +12,115 @@
 #include "Nube.hpp"
 #include "GloboAerostatico.hpp"
 #include "ClimaControl.hpp"
+#include "MusicManager.hpp"
+#include "Button.hpp"
+
+using namespace std;
+using namespace sf;
+
+enum class GameState {
+    MAIN_MENU,
+    PLAYING,
+    NEXT_LEVEL,
+    GAME_OVER
+};
 
 int main()
 {
-    // ¿Estamos mostrando la transición al siguiente nivel?
-    bool next_level = 0;
-
+    GameState game_state = GameState::MAIN_MENU;
     unsigned char level = 0;
-
     unsigned short timer = TIMER_INITIAL_DURATION;
     unsigned short timer_duration = TIMER_INITIAL_DURATION;
+    array<bool, 5> altitude_zones = {0};
+    chrono::microseconds lag(0);
 
-    std::array<bool, 5> altitude_zones = {0}; // Cambiado de swamp a altitude_zones
+    RenderWindow window(VideoMode(CELL_SIZE * MAP_WIDTH * SCREEN_RESIZE, 
+                       SCREEN_RESIZE * (FONT_HEIGHT + CELL_SIZE * MAP_HEIGHT)), 
+                       "SkyCrosser", Style::Close);
+    window.setView(View(FloatRect(0, 0, CELL_SIZE * MAP_WIDTH, FONT_HEIGHT + CELL_SIZE * MAP_HEIGHT)));
 
-    std::chrono::microseconds lag(0);
+    // Cargar recursos
+    Texture menu_texture;
+    if (!menu_texture.loadFromFile("assets/images/menu_background.png")) {
+        return EXIT_FAILURE;
+    }
+    Sprite menu_sprite(menu_texture);
+    menu_sprite.setScale(
+        (CELL_SIZE * MAP_WIDTH) / menu_sprite.getLocalBounds().width,
+        (FONT_HEIGHT + CELL_SIZE * MAP_HEIGHT) / menu_sprite.getLocalBounds().height
+    );
 
-    std::chrono::steady_clock::time_point previous_time;
+    // Botones
+    Button play_button;
+    play_button.load_textures("assets/images/play_button.png", "assets/images/play_button_pressed.png");
+    play_button.set_position(CELL_SIZE * MAP_WIDTH / 2 - 100, CELL_SIZE * MAP_HEIGHT / 2);
 
-    sf::Event event;
+    Button exit_button;
+    exit_button.load_textures("assets/images/exit_button.png", "assets/images/exit_button_pressed.png");
+    exit_button.set_position(CELL_SIZE * MAP_WIDTH / 2 - 100, CELL_SIZE * MAP_HEIGHT / 2 + 120);
 
-    sf::RenderWindow window(sf::VideoMode(CELL_SIZE * MAP_WIDTH * SCREEN_RESIZE, SCREEN_RESIZE * (FONT_HEIGHT + CELL_SIZE * MAP_HEIGHT)), "SkyCrosser", sf::Style::Close); // Cambiado el título a "SkyCrosser"
-    window.setView(sf::View(sf::FloatRect(0, 0, CELL_SIZE * MAP_WIDTH, FONT_HEIGHT + CELL_SIZE * MAP_HEIGHT)));
+    // Música
+    MusicManager music_manager;
+    music_manager.play_menu_music();
 
-    TorreControl torre_control(level); // Cambiado CarsManager por TorreControl
+    // Objetos del juego
+    TorreControl torre_control(level);
+    Pajaro pajaro;
+    ClimaControl clima_control(level);
 
-    Pajaro pajaro; // Cambiado Frog por Pajaro
+    chrono::steady_clock::time_point previous_time = chrono::steady_clock::now();
+    bool mouse_pressed = false;
 
-    ClimaControl clima_control(level); // Cambiado RiverManager por ClimaControl
-
-    previous_time = std::chrono::steady_clock::now();
-
-    while (1 == window.isOpen())
+    while (window.isOpen())
     {
-        std::chrono::microseconds delta_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - previous_time);
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed)
+                window.close();
 
+            if (event.type == Event::MouseButtonPressed)
+                mouse_pressed = true;
+            else if (event.type == Event::MouseButtonReleased)
+                mouse_pressed = false;
+        }
+
+        Vector2f mouse_pos = window.mapPixelToCoords(Mouse::getPosition(window));
+
+        if (game_state == GameState::MAIN_MENU)
+        {
+            play_button.update(mouse_pos, mouse_pressed);
+            exit_button.update(mouse_pos, mouse_pressed);
+
+            if (play_button.is_clicked())
+            {
+                game_state = GameState::PLAYING;
+                music_manager.play_game_music();
+            }
+            else if (exit_button.is_clicked())
+            {
+                window.close();
+            }
+        }
+
+        chrono::microseconds delta_time = chrono::duration_cast<chrono::microseconds>(
+            chrono::steady_clock::now() - previous_time);
         lag += delta_time;
-
         previous_time += delta_time;
 
         while (FRAME_DURATION <= lag)
         {
             lag -= FRAME_DURATION;
 
-            while (1 == window.pollEvent(event))
+            if (game_state == GameState::PLAYING)
             {
-                switch (event.type)
-                {
-                case sf::Event::Closed:
-                {
-                    window.close();
-                }
-                }
-            }
-
-            if (1 == next_level)
-            {
-                if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
-                {
-                    next_level = 0;
-                }
-            }
-            else
-            {
-                if (0 == pajaro.get_dead()) // Cambiado frog por pajaro
+                if (0 == pajaro.get_dead())
                 {
                     if (0 == timer)
                     {
                         pajaro.set_dead();
+                        game_state = GameState::GAME_OVER;
+                        music_manager.play_menu_music();
                     }
                     else
                     {
@@ -87,98 +129,95 @@ int main()
                 }
 
                 pajaro.update();
+                torre_control.update(pajaro);
+                clima_control.update(pajaro);
 
-                torre_control.update(pajaro); // Cambiado cars_manager por torre_control
-
-                clima_control.update(pajaro); // Cambiado river_manager por clima_control
-            }
-
-            if (1 == pajaro.get_dead())
-            {
-                if (1 == sf::Keyboard::isKeyPressed(sf::Keyboard::Enter))
+                if (1 == pajaro.update_altitude(altitude_zones))
                 {
-                    level = 0;
+                    bool all_zones_reached = 1;
+                    for (unsigned char a = 0; a < altitude_zones.size(); a++)
+                    {
+                        if (0 == altitude_zones[a])
+                        {
+                            all_zones_reached = 0;
+                            break;
+                        }
+                    }
 
-                    timer = TIMER_INITIAL_DURATION;
-                    timer_duration = TIMER_INITIAL_DURATION;
+                    if (1 == all_zones_reached)
+                    {
+                        game_state = GameState::NEXT_LEVEL;
+                        level++;
+                        timer_duration = max<unsigned short>(floor(0.25f * TIMER_INITIAL_DURATION), timer_duration - TIMER_REDUCTION);
+                        timer = timer_duration;
 
-                    altitude_zones.fill(0); // Cambiado swamp por altitude_zones
+                        if (TOTAL_LEVELS == level)
+                        {
+                            level = static_cast<unsigned char>(floor(0.5f * TOTAL_LEVELS));
+                        }
 
-                    torre_control.generate_level(level);
-                    clima_control.generate_level(level);
-
+                        altitude_zones.fill(0);
+                        torre_control.generate_level(level);
+                        clima_control.generate_level(level);
+                    }
                     pajaro.reset();
                 }
             }
-            else if (1 == pajaro.update_altitude(altitude_zones)) // Cambiado update_swamp por update_altitude
+            else if (game_state == GameState::GAME_OVER)
             {
-                bool all_zones_reached = 1; // Mejor nombre para la variable
-
-                for (unsigned char a = 0; a < altitude_zones.size(); a++)
+                if (Keyboard::isKeyPressed(Keyboard::Enter))
                 {
-                    if (0 == altitude_zones[a])
-                    {
-                        all_zones_reached = 0;
-                        break;
-                    }
-                }
-
-                if (1 == all_zones_reached)
-                {
-                    next_level = 1;
-                    level++;
-
-                    timer_duration = std::max<unsigned short>(floor(0.25f * TIMER_INITIAL_DURATION), timer_duration - TIMER_REDUCTION);
-                    timer = timer_duration;
-
-                    if (TOTAL_LEVELS == level)
-                    {
-                        level = static_cast<unsigned char>(floor(0.5f * TOTAL_LEVELS));
-                    }
-
+                    level = 0;
+                    timer = TIMER_INITIAL_DURATION;
+                    timer_duration = TIMER_INITIAL_DURATION;
                     altitude_zones.fill(0);
-
                     torre_control.generate_level(level);
                     clima_control.generate_level(level);
+                    pajaro.reset();
+                    game_state = GameState::PLAYING;
+                    music_manager.play_game_music();
                 }
-                else
-                {
-                    timer = std::min<unsigned short>(timer_duration, timer + floor(0.5f * timer_duration));
-                }
-
-                pajaro.reset();
             }
-
-            if (FRAME_DURATION > lag)
+            else if (game_state == GameState::NEXT_LEVEL)
             {
-                window.clear();
-
-                if (1 == next_level)
+                if (Keyboard::isKeyPressed(Keyboard::Enter))
                 {
-                    draw_text(1, 0, 0, "NEXT LEVEL!", window);
+                    game_state = GameState::PLAYING;
                 }
-                else
-                {
-                    draw_map(altitude_zones, window); // Cambiado swamp por altitude_zones
-
-                    if (0 == pajaro.get_dead())
-                    {
-                        clima_control.draw(window);
-                        pajaro.draw(window);
-                    }
-                    else
-                    {
-                        pajaro.draw(window);
-                        clima_control.draw(window);
-                    }
-
-                    torre_control.draw(window);
-
-                    draw_text(0, 0, CELL_SIZE * MAP_HEIGHT, "Time: " + std::to_string(static_cast<unsigned short>(floor(timer / 64.f))), window);
-                }
-
-                window.display();
             }
         }
+
+        window.clear();
+
+        if (game_state == GameState::MAIN_MENU)
+        {
+            window.draw(menu_sprite);
+            play_button.draw(window);
+            exit_button.draw(window);
+            
+            draw_text(1, CELL_SIZE * MAP_WIDTH / 2, CELL_SIZE * MAP_HEIGHT / 4, 
+                     "SKYCROSSER", window);
+        }
+        else if (game_state == GameState::PLAYING)
+        {
+            draw_map(altitude_zones, window);
+            clima_control.draw(window);
+            pajaro.draw(window);
+            torre_control.draw(window);
+            draw_text(0, 0, CELL_SIZE * MAP_HEIGHT, 
+                      "Time: " + to_string(static_cast<unsigned short>(floor(timer / 64.f))), window);
+        }
+        else if (game_state == GameState::NEXT_LEVEL)
+        {
+            draw_text(1, 0, 0, "NEXT LEVEL!", window);
+        }
+        else if (game_state == GameState::GAME_OVER)
+        {
+            draw_text(1, 0, 0, "GAME OVER - PRESIONA ENTER", window);
+        }
+
+        window.display();
     }
+
+    return 0;
 }
