@@ -3,9 +3,9 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
-#include "include/Pajaro.hpp"
-#include "include/Global.hpp"
-#include "include/GloboAerostatico.hpp"
+#include "Pajaro.hpp"
+#include "Global.hpp"
+#include "GloboAerostatico.hpp"
 
 GloboAerostatico::GloboAerostatico(bool i_diving, unsigned char i_size, unsigned char i_x, unsigned char i_y) :
     direction(i_y % 2),

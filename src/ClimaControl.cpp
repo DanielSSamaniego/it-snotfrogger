@@ -3,11 +3,11 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
-#include "include/Pajaro.hpp"
-#include "include/Global.hpp"
-#include "include/Nube.hpp"
-#include "include/GloboAerostatico.hpp"
-#include "include/ClimaControl.hpp"
+#include "Pajaro.hpp"
+#include "Global.hpp"
+#include "Nube.hpp"
+#include "GloboAerostatico.hpp"
+#include "ClimaControl.hpp"
 
 ClimaControl::ClimaControl(unsigned char i_level)
 {

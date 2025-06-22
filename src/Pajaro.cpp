@@ -3,8 +3,8 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
-#include "include/Pajaro.hpp"
-#include "include/Global.hpp"
+#include "Pajaro.hpp"
+#include "Global.hpp"
 
 Pajaro::Pajaro()
 {

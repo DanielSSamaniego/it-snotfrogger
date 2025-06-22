@@ -2,10 +2,10 @@
 #include <chrono>
 #include <SFML/Graphics.hpp>
 
-#include "include/Avion.hpp"
-#include "include/Pajaro.hpp"
-#include "include/TorreControl.hpp"
-#include "include/Global.hpp"
+#include "Avion.hpp"
+#include "Pajaro.hpp"
+#include "TorreControl.hpp"
+#include "Global.hpp"
 
 TorreControl::TorreControl(unsigned char i_level)
 {

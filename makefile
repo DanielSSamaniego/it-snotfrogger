@@ -5,8 +5,8 @@ SFML := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lbox2d
 INCLUDE := -Iinclude
 EXE := bin/$(GAME)
 
-# Regla principal (compila solo main.cpp)
-$(EXE): src/main.cpp src/boton.cpp
+# Regla principal (compila solo Main.cpp)
+$(EXE): src/Main.cpp src/TorreControl.cpp src/Pajaro.cpp src/ClimaControl.cpp src/DrawMap.cpp src/DrawText.cpp src/Nube.cpp src/GloboAerostatico.cpp src/Avion.cpp
 	$(CXX) $^ -o $@ $(INCLUDE) $(SFML) -std=c++17
 
 # Regla para ejecutar

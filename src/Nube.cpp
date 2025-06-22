@@ -3,9 +3,9 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
-#include "include/Pajaro.hpp"
-#include "include/Global.hpp"
-#include "include/Nube.hpp"
+#include "Pajaro.hpp"
+#include "Global.hpp"
+#include "Nube.hpp"
 
 Nube::Nube(unsigned char i_type, unsigned char i_x, unsigned char i_y) :
     direction(i_y % 2),

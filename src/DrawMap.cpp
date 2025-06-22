@@ -3,13 +3,13 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
-#include "include/DrawMap.hpp"
-#include "include/Global.hpp"
+#include "DrawMap.hpp"
+#include "Global.hpp"
 
 using namespace std;
 using namespace sf;
 
-void dibujar_mapa(const array<bool, 5> &update_altitude, RenderWindow &ventana)
+void draw_map(const array<bool, 5> &update_altitude, RenderWindow &ventana)
 {
     Sprite sprite;
 

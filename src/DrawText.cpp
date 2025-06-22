@@ -2,8 +2,8 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
-#include "include/DrawText.hpp"
-#include "include/Global.hpp"
+#include "DrawText.hpp"
+#include "Global.hpp"
 
 using namespace std;
 using namespace sf;

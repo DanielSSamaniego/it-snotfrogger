@@ -2,8 +2,8 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
-#include "include/Avion.hpp"
-#include "include/Global.hpp"
+#include "Avion.hpp"
+#include "Global.hpp"
 
 Avion::Avion(unsigned char i_x, unsigned char i_y) :  
     direction(i_y % 2),
