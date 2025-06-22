@@ -1,10 +1,11 @@
-PROYECTO:=game
+GAME := game
 SFML := -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio -lbox2d
-CXX :=c++
+CXX :=g++
 INCLUDE := -Iinclude
-EXE := bin/$(PROYECTO)
+EXE := bin/$(GAME)
+TEMP_PATH := /c/Users/herod/AppData/Local/Temp
 $(EXE) : src/main.cpp
-	$(CXX) $< -o $@ $(SFML) $(INCLUDE) -std=c++17
+	TEMP=$(TEMP_PATH) TMP=$(TEMP_PATH) $(CXX) $< -o $@ $(SFML) $(INCLUDE) -std=c++17
 
 run : $(EXE)
 	./$<
