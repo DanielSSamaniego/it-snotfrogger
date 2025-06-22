@@ -9,7 +9,7 @@
 using namespace std;
 using namespace sf;
 
-void dibujar_mapa(const array<bool, 5> &update_swamp, RenderWindow &ventana)
+void dibujar_mapa(const array<bool, 5> &update_altitude, RenderWindow &ventana)
 {
     Sprite sprite;
 
@@ -76,9 +76,9 @@ void dibujar_mapa(const array<bool, 5> &update_swamp, RenderWindow &ventana)
         // Dibujamos los pájaros en las zonas de anidación
         sprite.setTextureRect(IntRect(9 * CELL_SIZE, 0, CELL_SIZE, CELL_SIZE));
 
-        for (unsigned char i = 0; i < update_swamp.size(); i++)
+        for (unsigned char i = 0; i < update_altitude.size(); i++)
         {
-            if (1 == update_swamp[i])
+            if (1 == update_altitude[i])
             {
                 sprite.setPosition(3 * CELL_SIZE * (0.5f + i), CELL_SIZE);
 
